@@ -1,26 +1,35 @@
 import React from 'react';
-import { render, cleanup } from '@testing-library/react';
+import { render, cleanup, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import Modal from '..'
-import { describe, it } from 'node:test';
-import { hasUncaughtExceptionCaptureCallback } from 'node:process';
+import Modal from '..';
 
+const mockToggleModal = jest.fn();
 const currentPhoto = {
     name: 'Park bench',
     category: 'landscape',
     description: 'lorem ipsum dolor sit',
     index: 1
-}
+};
+
+afterEach(cleanup);
 
 describe('Modal component', () => {
     it('renders', () => {
-
+        render(<Modal
+            onClose={mockToggleModal}
+            currentPhoto={currentPhoto}
+          />);
     })
 
-    it('matches snapshot DOM node structure',  () => {
-
+    it('matches snapshot DOM node structure', () => {
+        const { asFragment } = render(<Modal
+            onClose={mockToggleModal}
+            currentPhoto={currentPhoto}
+          />);
+      
+          expect(asFragment()).toMatchSnapshot();
+        });
     })
-})
 
 describe('Click Event', () => {
     it('calls onClose handler', () => {
@@ -28,10 +37,8 @@ describe('Click Event', () => {
             onClose={mockToggleModal}
             currentPhoto={currentPhoto}
             />);
-        
-            fireEvent.click(getByText('Close this modal'));
+        fireEvent.click(getByText('Close this modal'))
 
-            hasUncaughtExceptionCaptureCallback(mockToggleModal).toHaveBeenCalledTimes(1);
+            expect(mockToggleModal).toHaveBeenCalledTimes(1);
     });
 })
-
